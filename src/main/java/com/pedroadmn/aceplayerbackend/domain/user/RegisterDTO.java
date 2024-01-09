@@ -1,4 +1,4 @@
 package com.pedroadmn.aceplayerbackend.domain.user;
 
-public record RegisterDTO(String login, String password, UserRole role) {
+public record RegisterDTO(String email, String password, UserRole role) {
 }
