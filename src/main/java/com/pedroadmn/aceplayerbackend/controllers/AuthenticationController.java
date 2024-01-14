@@ -4,7 +4,7 @@ import com.pedroadmn.aceplayerbackend.domain.user.AuthenticationDTO;
 import com.pedroadmn.aceplayerbackend.domain.user.LoginResponseDTO;
 import com.pedroadmn.aceplayerbackend.domain.user.RegisterDTO;
 import com.pedroadmn.aceplayerbackend.domain.user.User;
-import com.pedroadmn.aceplayerbackend.infra.security.TokenService;
+import com.pedroadmn.aceplayerbackend.infra.security.JwtService;
 import com.pedroadmn.aceplayerbackend.repositories.UserRepository;
 import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
@@ -21,12 +21,12 @@ import org.springframework.web.bind.annotation.RestController;
 public class AuthenticationController {
     private final AuthenticationManager authenticationManager;
     private final UserRepository repository;
-    private final TokenService tokenService;
+    private final JwtService jwtService;
 
-    public AuthenticationController(AuthenticationManager authenticationManager, UserRepository repository, TokenService tokenService) {
+    public AuthenticationController(AuthenticationManager authenticationManager, UserRepository repository, JwtService jwtService) {
         this.authenticationManager = authenticationManager;
         this.repository = repository;
-        this.tokenService = tokenService;
+        this.jwtService = jwtService;
     }
 
     @PostMapping("/login")
@@ -34,7 +34,7 @@ public class AuthenticationController {
         var usernamePassword = new UsernamePasswordAuthenticationToken(data.email(), data.password());
         var auth = this.authenticationManager.authenticate(usernamePassword);
 
-        var token = tokenService.generateToken((User) auth.getPrincipal());
+        var token = jwtService.generateToken((User) auth.getPrincipal());
 
         return ResponseEntity.ok(new LoginResponseDTO(token));
     }
