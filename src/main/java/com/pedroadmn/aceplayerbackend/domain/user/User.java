@@ -1,10 +1,8 @@
 package com.pedroadmn.aceplayerbackend.domain.user;
 
+import com.pedroadmn.aceplayerbackend.token.Token;
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.EqualsAndHashCode;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import lombok.*;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -12,22 +10,28 @@ import org.springframework.security.core.userdetails.UserDetails;
 import java.util.Collection;
 import java.util.List;
 
-@Table(name = "users")
-@Entity(name = "users")
-@Getter
+@Data
+@Builder
 @NoArgsConstructor
 @AllArgsConstructor
+@Table(name = "users")
+@Entity(name = "users")
 @EqualsAndHashCode(of = "id")
 public class User implements UserDetails {
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
     private String id;
-    private String login;
+    private String firstName;
+    private String lastName;
+    private String email;
     private String password;
+    @Enumerated(EnumType.STRING)
     private UserRole role;
+    @OneToMany(mappedBy = "user")
+    private List<Token> tokens;
 
-    public User(String login, String password, UserRole role){
-        this.login = login;
+    public User(String email, String password, UserRole role){
+        this.email = email;
         this.password = password;
         this.role = role;
     }
@@ -40,7 +44,7 @@ public class User implements UserDetails {
 
     @Override
     public String getUsername() {
-        return login;
+        return email;
     }
 
     @Override
