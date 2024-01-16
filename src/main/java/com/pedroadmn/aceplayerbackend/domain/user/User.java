@@ -1,5 +1,6 @@
 package com.pedroadmn.aceplayerbackend.domain.user;
 
+import com.pedroadmn.aceplayerbackend.token.Token;
 import jakarta.persistence.*;
 import lombok.*;
 import org.springframework.security.core.GrantedAuthority;
@@ -26,6 +27,8 @@ public class User implements UserDetails {
     private String password;
     @Enumerated(EnumType.STRING)
     private UserRole role;
+    @OneToMany(mappedBy = "user")
+    private List<Token> tokens;
 
     public User(String email, String password, UserRole role){
         this.email = email;

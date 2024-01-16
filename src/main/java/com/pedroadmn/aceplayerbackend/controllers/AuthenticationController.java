@@ -33,12 +33,6 @@ public class AuthenticationController {
     @PostMapping("/register")
     public ResponseEntity<AuthenticationResponse> register(@RequestBody @Valid RegisterRequest request) {
         if(this.repository.findByEmail(request.email()).isPresent()) return ResponseEntity.badRequest().build();
-
-        String encryptedPassword = new BCryptPasswordEncoder().encode(request.password());
-        User newUser = new User(request.email(), encryptedPassword, request.role());
-
-        this.repository.save(newUser);
-
         return ResponseEntity.ok(authenticationService.register(request));
     }
 }

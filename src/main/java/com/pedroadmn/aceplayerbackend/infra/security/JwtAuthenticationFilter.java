@@ -1,6 +1,7 @@
 package com.pedroadmn.aceplayerbackend.infra.security;
 
 import com.pedroadmn.aceplayerbackend.repositories.UserRepository;
+import com.pedroadmn.aceplayerbackend.token.TokenRepository;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -20,8 +21,9 @@ import java.io.IOException;
 @Component
 @RequiredArgsConstructor
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
-    final JwtService jwtService;
-    final UserRepository userRepository;
+    private final JwtService jwtService;
+    private final UserRepository userRepository;
+    private final TokenRepository tokenRepository;
     private final UserDetailsService userDetailsService;
 
     @Override
@@ -32,7 +34,10 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             var email = jwtService.extractEmail(token);
             if (email != null && SecurityContextHolder.getContext().getAuthentication() == null) {
                 UserDetails userDetails = this.userDetailsService.loadUserByUsername(email);
-                if (jwtService.isTokenValid(token, userDetails)) {
+                var isTokenValid = tokenRepository.findByToken(token)
+                        .map(t -> !t.isExpired() && !t.isRevoked())
+                        .orElse(false);
+                if (jwtService.isTokenValid(token, userDetails) && isTokenValid) {
                     var authentication = new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
                     authentication.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
                     SecurityContextHolder.getContext().setAuthentication(authentication);
