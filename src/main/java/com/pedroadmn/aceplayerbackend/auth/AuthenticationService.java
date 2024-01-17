@@ -1,16 +1,25 @@
 package com.pedroadmn.aceplayerbackend.auth;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.pedroadmn.aceplayerbackend.domain.user.User;
 import com.pedroadmn.aceplayerbackend.infra.security.JwtService;
 import com.pedroadmn.aceplayerbackend.repositories.UserRepository;
 import com.pedroadmn.aceplayerbackend.token.Token;
 import com.pedroadmn.aceplayerbackend.token.TokenRepository;
 import com.pedroadmn.aceplayerbackend.token.TokenType;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpHeaders;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
 import org.springframework.stereotype.Service;
+
+import java.io.IOException;
 
 @Service
 @RequiredArgsConstructor
@@ -33,12 +42,14 @@ public class AuthenticationService {
 
         var savedUser = userRepository.save(user);
 
-        var jwtToken = jwtService.generateTokenJwts(user);
+        var jwtToken = jwtService.generateToken(user);
+        var refreshToken = jwtService.generateRefreshToken(user);
 
         saveUserToken(savedUser, jwtToken);
 
         return AuthenticationResponse.builder()
                 .accessToken(jwtToken)
+                .refreshToken(refreshToken)
                 .build();
     }
 
@@ -52,13 +63,15 @@ public class AuthenticationService {
 
         var user = userRepository.findByEmail(request.email()).orElseThrow();
 
-        var jwtToken = jwtService.generateTokenJwts(user);
+        var jwtToken = jwtService.generateToken(user);
+        var refreshToken = jwtService.generateRefreshToken(user);
 
         revokeAllUserTokens(user);
         saveUserToken(user, jwtToken);
         
         return AuthenticationResponse.builder()
                 .accessToken(jwtToken)
+                .refreshToken(refreshToken)
                 .build();
     }
 
@@ -85,5 +98,34 @@ public class AuthenticationService {
                 .build();
 
         tokenRepository.save(token);
+    }
+
+    public void refreshToken(HttpServletRequest request, HttpServletResponse response) throws IOException {
+        final String authHeader = request.getHeader(HttpHeaders.AUTHORIZATION);
+        final String refreshToken;
+        final String userEmail;
+
+        if (authHeader == null || !authHeader.startsWith("Bearer ")) {
+            return;
+        }
+
+        refreshToken = authHeader.substring(7);
+        var email = jwtService.extractEmail(refreshToken);
+
+        if (email != null) {
+            var user = this.userRepository.findByEmail(email).orElseThrow();
+
+            if (jwtService.isTokenValid(refreshToken, user)) {
+                var accessToken = jwtService.generateToken(user);
+                revokeAllUserTokens(user);
+                saveUserToken(user, accessToken);
+                var authResponse = AuthenticationResponse.builder()
+                        .accessToken(accessToken)
+                        .refreshToken(refreshToken)
+                        .build();
+
+                new ObjectMapper().writeValue(response.getOutputStream(), authResponse);
+            }
+        }
     }
 }
