@@ -37,7 +37,15 @@ public class AuthenticationController {
         return ResponseEntity.accepted().build();
     }
 
+    @PostMapping("/authenticate")
+    public ResponseEntity<AuthenticationResponse> authenticate(@RequestBody @Valid AuthenticationRequest request) {
+        return ResponseEntity.ok(authenticationService.authenticate(request));
+    }
 
+    @GetMapping("/activate-account")
+    public void confirmAccount(@RequestParam String token) throws MessagingException {
+        authenticationService.activateAccount(token);
+    }
 
 //    @PostMapping("/refresh-token")
 //    public void refreshToken(HttpServletRequest request, HttpServletResponse response) throws IOException {

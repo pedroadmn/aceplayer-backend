@@ -1,20 +1,19 @@
 package com.pedroadmn.aceplayerbackend.auth;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+//import com.fasterxml.jackson.annotation.JsonProperty;
 
-@Data
+import lombok.Builder;
+import lombok.Getter;
+import lombok.Setter;
+
+@Getter
+@Setter
 @Builder
-@AllArgsConstructor
-@NoArgsConstructor
 public class AuthenticationResponse {
 
-    @JsonProperty("access_token")
-    private String accessToken;
+//    @JsonProperty("access_token")
+    private String token;
 
-    @JsonProperty("refresh_token")
-    private String refreshToken;
+//    @JsonProperty("refresh_token")
+//    private String refreshToken;
 }
