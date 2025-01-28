@@ -1,16 +1,19 @@
 package com.pedroadmn.aceplayerbackend;
 
 import com.pedroadmn.aceplayerbackend.auth.AuthenticationService;
-import com.pedroadmn.aceplayerbackend.auth.RegisterRequest;
+import com.pedroadmn.aceplayerbackend.auth.RegistrationRequest;
+import com.pedroadmn.aceplayerbackend.domain.role.Role;
+import com.pedroadmn.aceplayerbackend.repositories.role.RoleRepository;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Bean;
-
-import static com.pedroadmn.aceplayerbackend.domain.user.UserRole.ADMIN;
-import static com.pedroadmn.aceplayerbackend.domain.user.UserRole.MANAGER;
+import org.springframework.data.jpa.repository.config.EnableJpaAuditing;
+import org.springframework.scheduling.annotation.EnableAsync;
 
 @SpringBootApplication
+@EnableJpaAuditing
+@EnableAsync
 public class AceplayerBackendApplication {
 
 	public static void main(String[] args) {
@@ -18,29 +21,13 @@ public class AceplayerBackendApplication {
 	}
 
 	@Bean
-	public CommandLineRunner commandLineRunner(
-		AuthenticationService authenticationService
+	public CommandLineRunner runner(
+		RoleRepository roleRepository
 	) {
 		return args -> {
-			var admin = RegisterRequest.builder()
-					.firstName("Admin")
-					.lastName("Admin")
-					.email("admin@mail.com")
-					.password("password")
-					.role(ADMIN)
-					.build();
-
-			System.out.println("Admin token: " + authenticationService.register(admin).getAccessToken());
-
-			var manager = RegisterRequest.builder()
-					.firstName("Manger")
-					.lastName("Manager")
-					.email("manager@mail.com")
-					.password("password")
-					.role(MANAGER)
-					.build();
-
-			System.out.println("Manager token: " + authenticationService.register(manager).getAccessToken());
+			if(roleRepository.findByName("USER").isEmpty()) {
+				roleRepository.save(Role.builder().name("USER").build());
+			}
 		};
 	}
 }

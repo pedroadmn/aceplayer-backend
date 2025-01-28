@@ -1,4 +1,4 @@
-package com.pedroadmn.aceplayerbackend.repositories;
+package com.pedroadmn.aceplayerbackend.repositories.user;
 
 import com.pedroadmn.aceplayerbackend.domain.user.User;
 import org.springframework.data.jpa.repository.JpaRepository;
