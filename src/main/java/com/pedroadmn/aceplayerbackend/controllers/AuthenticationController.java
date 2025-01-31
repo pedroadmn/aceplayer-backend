@@ -3,30 +3,22 @@ package com.pedroadmn.aceplayerbackend.controllers;
 import com.pedroadmn.aceplayerbackend.auth.AuthenticationResponse;
 import com.pedroadmn.aceplayerbackend.auth.AuthenticationService;
 import com.pedroadmn.aceplayerbackend.auth.AuthenticationRequest;
-import com.pedroadmn.aceplayerbackend.auth.RegisterRequest;
-import com.pedroadmn.aceplayerbackend.domain.user.User;
-import com.pedroadmn.aceplayerbackend.infra.security.JwtService;
-import com.pedroadmn.aceplayerbackend.repositories.UserRepository;
-import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpServletResponse;
+import com.pedroadmn.aceplayerbackend.auth.RegistrationRequest;
+import com.pedroadmn.aceplayerbackend.repositories.user.UserRepository;
+import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.mail.MessagingException;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
-
-import java.io.IOException;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
-@RequestMapping("/api/v1/auth")
+@RequestMapping("auth")
 @RequiredArgsConstructor
+@Tag(name = "Authentication")
 public class AuthenticationController {
-    private final UserRepository repository;
+    private final UserRepository userRepository;
     private final AuthenticationService authenticationService;
 
     @PostMapping("/login")
@@ -35,13 +27,28 @@ public class AuthenticationController {
     }
 
     @PostMapping("/register")
-    public ResponseEntity<AuthenticationResponse> register(@RequestBody @Valid RegisterRequest request) {
-        if(this.repository.findByEmail(request.email()).isPresent()) return ResponseEntity.badRequest().build();
-        return ResponseEntity.ok(authenticationService.register(request));
+    @ResponseStatus(HttpStatus.ACCEPTED)
+    public ResponseEntity<?> register(@RequestBody @Valid RegistrationRequest request) throws MessagingException {
+        if(this.userRepository.findByEmail(request.getEmail()).isPresent()) {
+            return ResponseEntity.badRequest().build();
+        }
+//        return ResponseEntity.ok(authenticationService.register(request));
+        authenticationService.register(request);
+        return ResponseEntity.accepted().build();
     }
 
-    @PostMapping("/refresh-token")
-    public void refreshToken(HttpServletRequest request, HttpServletResponse response) throws IOException {
-        authenticationService.refreshToken(request, response);
+    @PostMapping("/authenticate")
+    public ResponseEntity<AuthenticationResponse> authenticate(@RequestBody @Valid AuthenticationRequest request) {
+        return ResponseEntity.ok(authenticationService.authenticate(request));
     }
+
+    @GetMapping("/activate-account")
+    public void confirmAccount(@RequestParam String token) throws MessagingException {
+        authenticationService.activateAccount(token);
+    }
+
+//    @PostMapping("/refresh-token")
+//    public void refreshToken(HttpServletRequest request, HttpServletResponse response) throws IOException {
+//        authenticationService.refreshToken(request, response);
+//    }
 }
