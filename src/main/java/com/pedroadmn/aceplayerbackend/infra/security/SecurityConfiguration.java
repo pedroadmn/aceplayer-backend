@@ -22,6 +22,24 @@ import org.springframework.security.web.authentication.logout.LogoutHandler;
 @RequiredArgsConstructor
 @EnableMethodSecurity
 public class SecurityConfiguration {
+<<<<<<< Updated upstream
+=======
+
+    private static final String[] WHITE_LIST_URL = {
+            "/auth/**",
+            "/status",
+            "/v2/api-docs",
+            "/v3/api-docs",
+            "/v3/api-docs/**",
+            "/swagger-resources",
+            "/swagger-resources/**",
+            "/configuration/ui",
+            "/configuration/security",
+            "/swagger-ui/**",
+            "/webjars/**",
+            "/swagger-ui.html"};
+
+>>>>>>> Stashed changes
     private final JwtAuthenticationFilter jwtAuthenticationFilter;
     private final AuthenticationProvider authenticationProvider;
     private final LogoutHandler logoutHandler;
