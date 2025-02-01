@@ -1,9 +1,0 @@
-CREATE TABLE tokens (
-    id TEXT PRIMARY KEY UNIQUE NOT NULL,
-    token TEXT NOT NULL UNIQUE,
-    tokenType TEXT NOT NULL,
-    expired BOOL NOT NULL,
-    revoked BOOL NOT NULL,
-    userId TEXT NOT NULL,
-    CONSTRAINT USER_ID_FK FOREIGN KEY (userId) REFERENCES users (id) ON DELETE CASCADE
-);
