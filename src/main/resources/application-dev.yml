@@ -1,8 +1,10 @@
 spring:
+  config:
+    import: optional:file:.env[.properties]
   datasource:
-    url: jdbc:postgresql://localhost:5433/aceplayerdb
-    username: postgres
-    password: postgres
+    url: jdbc:postgresql://${POSTGRES_HOST:localhost}:${POSTGRES_LOCAL_PORT:5433}/${POSTGRES_DB}
+    username: ${POSTGRES_USER}
+    password: ${POSTGRES_PASSWORD}
     driver-class-name: org.postgresql.Driver
   jpa:
     hibernate:
@@ -14,10 +16,10 @@ spring:
     database: postgresql
     database-platform: org.hibernate.dialect.PostgreSQLDialect
   mail:
-    host: localhost
-    port: 1025
-    username: pedroadmn
-    password: pedroadmn
+    host: ${AP_MAIL_HOST:localhost}
+    port: ${AP_MAIL_PORT:1025}
+    username: ${AP_MAIL_USERNAME}
+    password: ${AP_MAIL_PASSWORD}
     properties:
       mail:
         smtp:
