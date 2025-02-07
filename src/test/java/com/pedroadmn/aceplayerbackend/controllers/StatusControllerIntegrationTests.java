@@ -11,9 +11,9 @@ import org.springframework.test.context.DynamicPropertyRegistry;
 import org.springframework.test.context.DynamicPropertySource;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
-import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.testcontainers.containers.PostgreSQLContainer;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 
 @SpringBootTest
@@ -56,8 +56,14 @@ class StatusControllerIntegrationTests {
                         .get(STATUS_ENDPOINT)
                         .accept("application/json")
                         .contentType("application/json"))
-                .andExpect(MockMvcResultMatchers.status().isOk())
-                .andExpect(MockMvcResultMatchers.jsonPath("key").exists())
-                .andExpect(MockMvcResultMatchers.jsonPath("key").value("status response"));
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.updated_at").exists())
+                .andExpect(jsonPath("$.dependencies.database.version").exists())
+                .andExpect(jsonPath("$.dependencies.database.version").value("16.0"))
+                .andExpect(jsonPath("$.dependencies.database.max_connections").exists())
+                .andExpect(jsonPath("$.dependencies.database.max_connections").value(100))
+                .andExpect(jsonPath("$.dependencies.database.opened_connections").exists())
+                // TODO: Go back to see whey the endpoint always return 10 opened connections
+                .andExpect(jsonPath("$.dependencies.database.opened_connections").value(10));
     }
 }
