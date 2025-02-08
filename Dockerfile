@@ -6,14 +6,14 @@ COPY src ./src
 RUN mvn clean package -DskipTests
 
 FROM openjdk:17-jdk-slim
-ARG PROFILE=dev
-ARG APP_VERSION=1.0.0
+ARG PROFILE=docker
+ARG APP_VERSION=1.0.1
 
 WORKDIR /app
 COPY --from=build /build/target/aceplayer-backend-*.jar /app/
 
-RUN APP_VERSION=$(ls /app | grep *.jar | awk 'NR==2{split($0,a,"-"); print a[3]}' | awk '{sub(/.jar$/,"")}1')\
-    && echo "Building container with BSN v-$version"
+#RUN APP_VERSION=$(ls /app | grep *.jar | awk 'NR==2{split($0,a,"-"); print a[3]}' | awk '{sub(/.jar$/,"")}1')\
+#    && echo "Building container with BSN v-$version"
 EXPOSE 8088
 
 ENV DB_URL=jdbc:postgresql://postgres-sql-ace-player:5432/aceplayerdb
