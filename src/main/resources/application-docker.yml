@@ -1,0 +1,46 @@
+spring:
+  config:
+    import: optional:file:.env.development[.properties]
+  datasource:
+    url: jdbc:postgresql://${POSTGRES_HOST:localhost}:${POSTGRES_LOCAL_PORT:5432}/${POSTGRES_DB}
+    username: ${POSTGRES_USER:postgres}
+    password: ${POSTGRES_PASSWORD:postgres}
+    driver-class-name: org.postgresql.Driver
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: false
+    properties:
+      hibernate:
+        format_sql: true
+    database: postgresql
+    database-platform: org.hibernate.dialect.PostgreSQLDialect
+  mail:
+    host: smtp.gmail.com
+    port: 465
+    username: pedroadmn@gmail.com
+    password: vzln hqni cprc dthg
+    properties:
+      mail:
+        smtp:
+          auth: true
+          ssl:
+            trust: "*"
+            enable: true
+        starttls:
+          enable: true
+        writetimeout: 5000
+    protocol: smtp
+application:
+  security:
+    token:
+      secret-key: '${JWT_SECRET:404E635266556A586E3272357538782F413F4428472B4B6250645367566B5970}'
+      expiration: 86400000 # a day
+      refresh-token:
+        expiration: 604800000 # 7 days
+  mailing:
+    frontend:
+      activation-url: http://localhost:4200/activate-account
+
+server:
+  port: 8088
