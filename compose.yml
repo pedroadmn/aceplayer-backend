@@ -9,13 +9,25 @@ services:
     volumes:
       - postgres:/data/postgres
     ports:
-      - "5433:5432"
+      - "5432:5432"
+    networks:
+      - spring-demo
+    restart: unless-stopped
   mail-dev:
     container_name: mail-dev-bsn
     image: maildev/maildev
     ports:
       - 1080:1080
       - 1025:1025
+  aceplayer-api:
+    container_name: aceplayer-api
+    image: aceplayer/aceplayer:1.0.0
+    ports:
+      - 8088:8088
+    networks:
+      - spring-demo
+    depends_on:
+      - postgres
 
 networks:
   spring-demo:
