@@ -1,8 +1,6 @@
 spring:
-  config:
-    import: optional:file:.env.development[.properties]
   datasource:
-    url: jdbc:postgresql://${POSTGRES_HOST:localhost}:${POSTGRES_LOCAL_PORT:5432}/${POSTGRES_DB}
+    url: jdbc:postgresql://${POSTGRES_HOST:localhost}:${POSTGRES_LOCAL_PORT:5433}/${POSTGRES_DB:aceplayerdb}
     username: ${POSTGRES_USER:postgres}
     password: ${POSTGRES_PASSWORD:postgres}
     driver-class-name: org.postgresql.Driver
@@ -18,8 +16,8 @@ spring:
   mail:
     host: ${AP_MAIL_HOST:localhost}
     port: ${AP_MAIL_PORT:1025}
-    username: ${AP_MAIL_USERNAME}
-    password: ${AP_MAIL_PASSWORD}
+    username: ${AP_MAIL_USERNAME:aceplayer}
+    password: ${AP_MAIL_PASSWORD:aceplayer}
     properties:
       mail:
         smtp:
