@@ -1,6 +1,7 @@
 package com.pedroadmn.aceplayerbackend.infra.security;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpHeaders;
@@ -16,12 +17,15 @@ import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 import org.springframework.web.filter.CorsFilter;
 
 import java.util.Arrays;
-import java.util.Collections;
+import java.util.List;
 
 @Configuration
 @RequiredArgsConstructor
 public class ApplicationConfig {
     private final UserDetailsService userDetailsService;
+
+    @Value("${application.cors.origins}")
+    private List<String> allowedOrigins;
 
     @Bean
     public AuthenticationProvider authenticationProvider() {
@@ -45,8 +49,8 @@ public class ApplicationConfig {
     public CorsFilter corsFilter() {
         final UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         final CorsConfiguration config = new CorsConfiguration();
-        config.setAllowCredentials(true);
-        config.setAllowedOrigins(Arrays.asList("http://localhost:4200", "https://aceplayeroficial.com.br/", "http://localhost:8080"));
+//        config.setAllowCredentials(true);
+        config.setAllowedOrigins(allowedOrigins);
         config.setAllowedHeaders(Arrays.asList(
                 HttpHeaders.ORIGIN,
                 HttpHeaders.CONTENT_TYPE,

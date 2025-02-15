@@ -7,7 +7,7 @@ RUN mvn clean package -DskipTests
 
 FROM openjdk:17-jdk-slim
 ARG PROFILE=docker
-ARG APP_VERSION=1.0.1
+ARG APP_VERSION=1.0.0
 
 WORKDIR /app
 COPY --from=build /build/target/aceplayer-backend-*.jar /app/
@@ -21,5 +21,8 @@ ENV MAILDEV_URL=localhost
 
 ENV ACTIVE_PROFILE=${PROFILE}
 ENV JAR_VERSION=${APP_VERSION}
+ENV AP_MAIL_HOST=missing_host_name
+ENV AP_MAIL_USERNAME=missing_username
+ENV AP_MAIL_PASSWORD=missing_password
 
 CMD java -jar -Dspring.profiles.active=${ACTIVE_PROFILE} -Dspring.datasource.url=${DB_URL} aceplayer-backend-${JAR_VERSION}.jar
